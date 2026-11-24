@@ -1,0 +1,65 @@
+{
+  "demo": true,
+  "synthetic": true,
+  "case_id": "demo-51977f9b-nlrp3-saki",
+  "note": "Synthetic, self-contained demo case. Records, DOIs (10.0000/...) and abstracts are fabricated for testing only; no real PRISMA review is represented.",
+  "review_question": "Does NLRP3 inflammasome inhibition reduce tubular pyroptosis in sepsis-associated acute kidney injury?",
+  "criteria": {
+    "year_from": 2015,
+    "year_to": 2024,
+    "languages": "en",
+    "designs": "randomized, cohort",
+    "require_fulltext": false
+  },
+  "records": [
+    {
+      "source_id": "R1",
+      "title": "NLRP3 inhibition reduces tubular pyroptosis in septic acute kidney injury: a randomised trial",
+      "abstract": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo. Tubular pyroptosis markers improved significantly in the intervention arm, and serious adverse events were similar.",
+      "year": 2022,
+      "doi": "10.0000/demo.k1",
+      "language": "en",
+      "study_type": "randomized controlled trial",
+      "journal": "Kidney International"
+    },
+    {
+      "source_id": "R2",
+      "title": "NLRP3 inhibition reduces tubular pyroptosis in septic acute kidney injury: a randomised trial",
+      "abstract": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo. Tubular pyroptosis markers improved significantly in the intervention arm, and serious adverse events were similar.",
+      "year": 2022,
+      "doi": "10.0000/demo.k1",
+      "language": "en",
+      "study_type": "randomized controlled trial",
+      "journal": "Kidney International"
+    },
+    {
+      "source_id": "R3",
+      "title": "Urinary NLRP3 predicts renal recovery in septic acute kidney injury: a prospective cohort",
+      "abstract": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+      "year": 2020,
+      "doi": "10.0000/demo.k2",
+      "language": "en",
+      "study_type": "cohort",
+      "journal": "Critical Care"
+    },
+    {
+      "source_id": "R4",
+      "title": "A historical view of inflammasome biology",
+      "abstract": "This review traces the discovery of inflammasome signalling complexes before modern molecular tools.",
+      "year": 2012,
+      "doi": "10.0000/demo.k3",
+      "language": "en",
+      "study_type": "review",
+      "journal": "Immunological Reviews"
+    }
+  ],
+  "output_contract": {
+    "case_id": "string",
+    "status": "string",
+    "result": "object",
+    "evidence": "array",
+    "uncertainty": "array",
+    "errors": "array",
+    "stats": "object"
+  }
+}
