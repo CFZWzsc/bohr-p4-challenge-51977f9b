@@ -58,6 +58,18 @@ description: Use when a review must follow a reproducible systematic-review prot
 - 单轮规则筛选，不替代双人独立筛选与分歧仲裁。
 - 不做 meta 分析、异质性或发表偏倚检验。
 
+## Quickstart
+
+在仓库根目录 `bohrium-competition` 执行（PowerShell，实测通过）：
+
+```powershell
+python -B "tracks\deep-research-literature-review\challenges\challenge-51977f9b\06_code\submission\scripts\run_skill.py" --case "tracks\deep-research-literature-review\challenges\challenge-51977f9b\06_code\submission\examples\demo-case\case.json" --out "$env:TEMP\demo_51977f9b\result.json" --work "$env:TEMP\demo_51977f9b\work"
+```
+
+- 示例输入：`examples/demo-case/case.json`，合成且自包含（`"demo": true`，4 条记录：1 条重复、2 条合格、1 条年份/设计不合格；DOI 均为虚构的 `10.0000/...`）。
+- 实测输出：`status = "success"`、`included = 2`，`result.json` 顶层含 `case_id`、`status`、`result`、`evidence`、`uncertainty`、`errors`、`stats`；同一输入两次运行结果逐字节一致。
+- 该用例只验证脚本可执行与输出契约齐全，不是真实的 PRISMA 流程结论。
+
 ## 最小调用示例（示例，非正式案例结果）
 
 ```bash
