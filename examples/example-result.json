@@ -1,0 +1,747 @@
+{
+  "case_id": "demo-51977f9b-nlrp3-saki",
+  "status": "success",
+  "result": {
+    "protocol": {
+      "criterion_version": "E1-E5/2026-11",
+      "search_version": "scopus-pubmed/2026-11",
+      "screening_rule_version": "two-round-record-ledger/2026-11",
+      "appraisal_scale_version": "judgment-4/2026-11",
+      "criteria_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "reason_codes_version": "1"
+    },
+    "human_edits": [],
+    "review_question": "Does NLRP3 inflammasome inhibition reduce tubular pyroptosis in sepsis-associated acute kidney injury?",
+    "search_strategy": {
+      "components": {
+        "question_terms": [
+          "nlrp3",
+          "inflammasome",
+          "inhibition",
+          "tubular",
+          "pyroptosis",
+          "sepsis-associated",
+          "acute",
+          "kidney",
+          "injury"
+        ],
+        "designs": [
+          "randomized",
+          "cohort"
+        ],
+        "languages": [
+          "en"
+        ],
+        "years": [
+          2015,
+          2024
+        ]
+      },
+      "query_string": "(\"nlrp3\" AND \"inflammasome\" AND \"inhibition\") AND (\"tubular\" OR \"pyroptosis\" OR \"sepsis-associated\" OR \"acute\" OR \"kidney\" OR \"injury\") AND (\"randomized\" OR \"cohort\") AND PUBYEAR >= 2015 AND PUBYEAR <= 2024 AND LANGUAGE(english)",
+      "query_string_pubmed": "(\"nlrp3\"[tiab] AND \"inflammasome\"[tiab] AND \"inhibition\"[tiab]) AND (\"tubular\"[tiab] OR \"pyroptosis\"[tiab] OR \"sepsis-associated\"[tiab] OR \"acute\"[tiab] OR \"kidney\"[tiab] OR \"injury\"[tiab]) AND (\"randomized\"[tiab] OR \"cohort\"[tiab]) AND (\"2015\"[dp] : \"2024\"[dp]) AND (english[la])",
+      "database": "supplied_record_batch",
+      "databases": [
+        "supplied_record_batch"
+      ],
+      "executed_at": "not_applicable (offline run)",
+      "hits_per_query": [
+        {
+          "label": "core_terms",
+          "query": "(\"nlrp3\" AND \"inflammasome\" AND \"inhibition\") AND (\"tubular\" OR \"pyroptosis\" OR \"sepsis-associated\" OR \"acute\" OR \"kidney\" OR \"injury\")",
+          "hits": 4
+        },
+        {
+          "label": "design_filter",
+          "query": "(\"randomized\" OR \"cohort\")",
+          "hits": 3
+        },
+        {
+          "label": "year_filter",
+          "query": "PUBYEAR >= 2015 AND PUBYEAR <= 2024",
+          "hits": 3
+        },
+        {
+          "label": "language_filter",
+          "query": "LANGUAGE(english)",
+          "hits": 4
+        },
+        {
+          "label": "combined_after_limits",
+          "query": "(\"nlrp3\" AND \"inflammasome\" AND \"inhibition\") AND (\"tubular\" OR \"pyroptosis\" OR \"sepsis-associated\" OR \"acute\" OR \"kidney\" OR \"injury\") AND (\"randomized\" OR \"cohort\") AND PUBYEAR >= 2015 AND PUBYEAR <= 2024 AND LANGUAGE(english)",
+          "hits": 3
+        }
+      ],
+      "fields": [
+        "title",
+        "abstract"
+      ],
+      "limits": {
+        "languages": [
+          "en"
+        ],
+        "years": [
+          2015,
+          2024
+        ],
+        "year_from_inclusive": true,
+        "year_to_applied": true
+      },
+      "note": "query_string uses Scopus syntax (PUBYEAR) and query_string_pubmed uses PubMed [tiab]/[dp]; both are paste-ready, but hit counts are computed on the supplied batch only and no external database was contacted"
+    },
+    "criteria": [
+      {
+        "id": "E1",
+        "element": "time",
+        "text": "Publication year is between 2015 and 2024.",
+        "origin": "case",
+        "active": true
+      },
+      {
+        "id": "E2",
+        "element": "language",
+        "text": "Language is en.",
+        "origin": "case",
+        "active": true
+      },
+      {
+        "id": "E3",
+        "element": "design",
+        "text": "Study design is randomized, cohort.",
+        "origin": "case",
+        "active": true
+      },
+      {
+        "id": "E4",
+        "element": "population_or_topic",
+        "text": "Title/abstract concerns the population and topic of the review question.",
+        "origin": "derived",
+        "active": true
+      },
+      {
+        "id": "E5",
+        "element": "full_text",
+        "text": "Title/abstract text is readable; full text not required.",
+        "origin": "derived",
+        "active": true
+      }
+    ],
+    "flow": {
+      "identified": 4,
+      "duplicates_removed": 1,
+      "screened": 3,
+      "title_abstract_excluded": 1,
+      "title_abstract_passed": 2,
+      "eligibility_excluded": 0,
+      "included": 2,
+      "pending": 0,
+      "duplicates_and_screen_excluded": 2,
+      "excluded_records": [
+        {
+          "source_id": "R2",
+          "title": "NLRP3 inhibition reduces tubular pyroptosis in septic acute kidney injury: a randomised trial",
+          "stage": "identification",
+          "decision": "duplicate",
+          "reasons": [
+            {
+              "round": "identification",
+              "code": "duplicate",
+              "detail": "duplicate DOI or title of R1"
+            }
+          ]
+        },
+        {
+          "source_id": "R4",
+          "title": "A historical view of inflammasome biology",
+          "stage": "title_abstract",
+          "decision": "exclude",
+          "reasons": [
+            {
+              "round": "title_abstract",
+              "code": "year",
+              "detail": "year 2012 is before 2015"
+            }
+          ]
+        }
+      ]
+    },
+    "flow_assertion": {
+      "ok": true,
+      "checks": [
+        {
+          "check": "identified_minus_duplicates_equals_screened",
+          "left": 3,
+          "right": 3,
+          "ok": true
+        },
+        {
+          "check": "screened_minus_excluded_equals_title_abstract_passed",
+          "left": 2,
+          "right": 2,
+          "ok": true
+        },
+        {
+          "check": "title_abstract_passed_minus_eligibility_excluded_equals_included",
+          "left": 2,
+          "right": 2,
+          "ok": true
+        }
+      ]
+    },
+    "screening_log": [
+      {
+        "id": "R1",
+        "index": 0,
+        "stage": "included",
+        "decision": "include",
+        "criteria_ids": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E5"
+        ],
+        "reason_code": "met_criteria",
+        "detail": "all applicable criteria met",
+        "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+        "locator": "/records/0#abstract"
+      },
+      {
+        "id": "R2",
+        "index": 1,
+        "stage": "identification",
+        "decision": "duplicate",
+        "criteria_ids": [],
+        "reason_code": "duplicate",
+        "detail": "duplicate DOI or title of R1",
+        "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+        "locator": "/records/1#abstract"
+      },
+      {
+        "id": "R3",
+        "index": 2,
+        "stage": "included",
+        "decision": "include",
+        "criteria_ids": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E5"
+        ],
+        "reason_code": "met_criteria",
+        "detail": "all applicable criteria met",
+        "quote": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+        "locator": "/records/2#abstract"
+      },
+      {
+        "id": "R4",
+        "index": 3,
+        "stage": "title_abstract",
+        "decision": "exclude",
+        "criteria_ids": [
+          "E1"
+        ],
+        "reason_code": "year",
+        "detail": "year 2012 is before 2015",
+        "quote": "This review traces the discovery of inflammasome signalling complexes before modern molecular tools.",
+        "locator": "/records/3#abstract"
+      }
+    ],
+    "quality_appraisal": [
+      {
+        "source_id": "R1",
+        "items": [
+          {
+            "item": "design_stated",
+            "judgment": "partly",
+            "basis": {
+              "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+              "locator": "/records/0#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "comparator",
+            "judgment": "partly",
+            "basis": {
+              "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+              "locator": "/records/0#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "sample_size",
+            "judgment": "partly",
+            "basis": {
+              "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+              "locator": "/records/0#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "outcome_measure",
+            "judgment": "partly",
+            "basis": {
+              "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+              "locator": "/records/0#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "statistics",
+            "judgment": "partly",
+            "basis": {
+              "quote": "Tubular pyroptosis markers improved significantly in the intervention arm, and serious adverse events were similar.",
+              "locator": "/records/0#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "limitations",
+            "judgment": "no",
+            "basis": {
+              "quote": "",
+              "locator": ""
+            },
+            "note": "no matching statement in the supplied text",
+            "value": "not reported",
+            "reported": false
+          }
+        ],
+        "judgment_counts": {
+          "yes": 0,
+          "partly": 5,
+          "no": 1,
+          "unclear": 0
+        },
+        "reported_items": 5,
+        "full_text_items": 0,
+        "total_items": 6,
+        "overall": "low",
+        "appraisal_level": "low",
+        "overall_rule": "judgment points: yes=1, partly=0.5, no=0, unclear=0; ratio = points / item count; high >= 0.75, moderate >= 0.5, low < 0.5; overall=unclear only when every item is unclear",
+        "note": "each dimension records a four-level judgment and the quote plus locator it rests on; this measures reporting completeness of the supplied text, not study conduct"
+      },
+      {
+        "source_id": "R3",
+        "items": [
+          {
+            "item": "design_stated",
+            "judgment": "partly",
+            "basis": {
+              "quote": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+              "locator": "/records/2#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "comparator",
+            "judgment": "no",
+            "basis": {
+              "quote": "",
+              "locator": ""
+            },
+            "note": "no matching statement in the supplied text",
+            "value": "not reported",
+            "reported": false
+          },
+          {
+            "item": "sample_size",
+            "judgment": "partly",
+            "basis": {
+              "quote": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+              "locator": "/records/2#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "outcome_measure",
+            "judgment": "partly",
+            "basis": {
+              "quote": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+              "locator": "/records/2#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "statistics",
+            "judgment": "partly",
+            "basis": {
+              "quote": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+              "locator": "/records/2#abstract"
+            },
+            "note": "matched only in the title/abstract layer",
+            "value": "reported",
+            "reported": true
+          },
+          {
+            "item": "limitations",
+            "judgment": "no",
+            "basis": {
+              "quote": "",
+              "locator": ""
+            },
+            "note": "no matching statement in the supplied text",
+            "value": "not reported",
+            "reported": false
+          }
+        ],
+        "judgment_counts": {
+          "yes": 0,
+          "partly": 4,
+          "no": 2,
+          "unclear": 0
+        },
+        "reported_items": 4,
+        "full_text_items": 0,
+        "total_items": 6,
+        "overall": "low",
+        "appraisal_level": "low",
+        "overall_rule": "judgment points: yes=1, partly=0.5, no=0, unclear=0; ratio = points / item count; high >= 0.75, moderate >= 0.5, low < 0.5; overall=unclear only when every item is unclear",
+        "note": "each dimension records a four-level judgment and the quote plus locator it rests on; this measures reporting completeness of the supplied text, not study conduct"
+      }
+    ],
+    "outcome_vocabulary": [
+      "nlrp3",
+      "acute",
+      "injury",
+      "kidney",
+      "septic",
+      "pyroptosis",
+      "tubular",
+      "adverse",
+      "events",
+      "inflammasome",
+      "inhibition",
+      "inhibitor",
+      "markers",
+      "recovery",
+      "renal"
+    ],
+    "evidence_table": [
+      {
+        "source_id": "R1",
+        "locator": "/records/0#abstract",
+        "title": "NLRP3 inhibition reduces tubular pyroptosis in septic acute kidney injury: a randomised trial",
+        "design": "randomized controlled trial",
+        "direction": "favours",
+        "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+        "year": 2022,
+        "material_id": "",
+        "match_method": "",
+        "appraisal_level": "low"
+      },
+      {
+        "source_id": "R3",
+        "locator": "/records/2#abstract",
+        "title": "Urinary NLRP3 predicts renal recovery in septic acute kidney injury: a prospective cohort",
+        "design": "cohort",
+        "direction": "no_difference",
+        "quote": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+        "year": 2020,
+        "material_id": "",
+        "match_method": "",
+        "appraisal_level": "low"
+      }
+    ],
+    "materials": [],
+    "synthesis": {
+      "certainty": "low (conflicting directions)",
+      "included": [
+        "R1",
+        "R3"
+      ],
+      "direction_summary": {
+        "favours": [
+          "R1"
+        ],
+        "no_difference": [
+          "R3"
+        ]
+      },
+      "conflict_ids": [
+        "C1"
+      ],
+      "statement": "2 record(s) met the stated criteria. Direction of effect: favours in R1; no_difference in R3. The included evidence conflicts (C1: R1 vs R3), so no single net direction is asserted. Boundary: conclusions are bounded by the supplied batch, its abstracts and any matched full-text paragraphs: no numerical pooling, risk-of-bias assessment, heterogeneity test or external database search was performed.",
+      "conclusions": [
+        {
+          "id": "K1",
+          "statement": "Direction 'favours' is reported by R1.",
+          "evidence_ids": [
+            "R1"
+          ],
+          "effect_on_conclusion": "provisional (no high-completeness study); cross-direction conflict blocks any net pooled claim"
+        },
+        {
+          "id": "K2",
+          "statement": "Direction 'no_difference' is reported by R3.",
+          "evidence_ids": [
+            "R3"
+          ],
+          "effect_on_conclusion": "provisional (no high-completeness study); cross-direction conflict blocks any net pooled claim"
+        }
+      ],
+      "boundary": "conclusions are bounded by the supplied batch, its abstracts and any matched full-text paragraphs: no numerical pooling, risk-of-bias assessment, heterogeneity test or external database search was performed",
+      "pooling": "no meta-analysis was performed; estimates are not combined numerically"
+    },
+    "conflicts": [
+      {
+        "id": "C1",
+        "type": "opposing_direction",
+        "directions": [
+          "favours",
+          "no_difference"
+        ],
+        "positions": [
+          {
+            "source_id": "R1",
+            "direction": "favours",
+            "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+            "locator": "/records/0#abstract",
+            "year": 2022
+          },
+          {
+            "source_id": "R3",
+            "direction": "no_difference",
+            "quote": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+            "locator": "/records/2#abstract",
+            "year": 2020
+          }
+        ],
+        "handling": "both directions are reported side by side; no numerical pooling is performed"
+      }
+    ],
+    "research_gaps": [
+      {
+        "id": "G1",
+        "gap_type": "full_text_verification",
+        "matrix_cell": {
+          "outcome": "any",
+          "population": "nlrp3 inflammasome inhibition tubular",
+          "design": "randomized, cohort"
+        },
+        "basis": {
+          "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+          "locator": "/records/0#abstract"
+        },
+        "why_not_omission": "the search string and E1-E5 criteria were applied to every supplied record; missing evidence therefore reflects the supplied corpus, not an omitted search step",
+        "note": "2 included record(s) have no matched full-text paragraph"
+      },
+      {
+        "id": "G2",
+        "gap_type": "screening_attrition",
+        "matrix_cell": {
+          "outcome": "any",
+          "population": "nlrp3 inflammasome inhibition tubular",
+          "design": "randomized, cohort"
+        },
+        "basis": {
+          "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+          "locator": "/records/1#abstract"
+        },
+        "why_not_omission": "the search string and E1-E5 criteria were applied to every supplied record; missing evidence therefore reflects the supplied corpus, not an omitted search step",
+        "note": "2 record(s) were excluded with a recorded reason"
+      }
+    ],
+    "artifacts": {
+      "report": "report.md",
+      "evidence_matrix": "evidence_matrix.csv",
+      "screening_log": "screening_log.csv"
+    },
+    "limitations": [
+      "The search was executed on the supplied batch, not on external databases.",
+      "Appraisal scores reporting completeness, not risk of bias in the underlying study.",
+      "Screening is single-reviewer and rule-based; dual independent screening is not simulated.",
+      "No meta-analysis, heterogeneity test or publication-bias assessment is performed.",
+      "Records without a matched full-text paragraph are appraised from the title/abstract layer only."
+    ],
+    "change_log": [
+      {
+        "step": 1,
+        "action": "load_input",
+        "before": 0,
+        "after": 4,
+        "counts": {
+          "records": 4,
+          "materials": 0,
+          "records_matched": 0
+        }
+      },
+      {
+        "step": 2,
+        "action": "build_search_strategy",
+        "before": 0,
+        "after": 4,
+        "counts": {
+          "queries": 2,
+          "components": 9
+        }
+      },
+      {
+        "step": 3,
+        "action": "remove_duplicates",
+        "before": 4,
+        "after": 3,
+        "counts": {
+          "duplicates_removed": 1
+        }
+      },
+      {
+        "step": 4,
+        "action": "screen_title_abstract",
+        "before": 3,
+        "after": 2,
+        "counts": {
+          "excluded": 1
+        }
+      },
+      {
+        "step": 5,
+        "action": "screen_eligibility",
+        "before": 2,
+        "after": 2,
+        "counts": {
+          "excluded": 0
+        }
+      },
+      {
+        "step": 6,
+        "action": "appraise_included",
+        "before": 2,
+        "after": 2,
+        "counts": {
+          "yes": 0,
+          "partly": 9,
+          "no": 3,
+          "unclear": 0
+        }
+      },
+      {
+        "step": 7,
+        "action": "synthesise",
+        "before": 2,
+        "after": 2,
+        "counts": {
+          "conflicts": 1,
+          "gaps": 2
+        }
+      },
+      {
+        "step": 8,
+        "action": "write_artifacts",
+        "before": 0,
+        "after": 3,
+        "counts": {
+          "artifacts": [
+            "evidence_matrix",
+            "report",
+            "screening_log"
+          ]
+        }
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "included_study",
+      "source_id": "R1",
+      "locator": "/records/0#abstract",
+      "title": "NLRP3 inhibition reduces tubular pyroptosis in septic acute kidney injury: a randomised trial",
+      "design": "randomized controlled trial",
+      "direction": "favours",
+      "quote": "In this randomised trial, 180 patients with septic acute kidney injury received an NLRP3 inhibitor or placebo.",
+      "year": 2022,
+      "material_id": "",
+      "match_method": "",
+      "appraisal_level": "low"
+    },
+    {
+      "kind": "included_study",
+      "source_id": "R3",
+      "locator": "/records/2#abstract",
+      "title": "Urinary NLRP3 predicts renal recovery in septic acute kidney injury: a prospective cohort",
+      "design": "cohort",
+      "direction": "no_difference",
+      "quote": "In a prospective cohort of 96 patients with sepsis, higher urinary NLRP3 was associated with slower renal recovery, but there was no significant difference in dialysis-free survival.",
+      "year": 2020,
+      "material_id": "",
+      "match_method": "",
+      "appraisal_level": "low"
+    }
+  ],
+  "uncertainty": [
+    {
+      "type": "no_materials",
+      "detail": "No md/txt/csv/json/pdf material was found next to the case; evidence stays at title/abstract level."
+    },
+    {
+      "type": "no_external_search",
+      "detail": "Search ran on the supplied batch; the flow is not a full database PRISMA."
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "records": 4,
+    "screened": 3,
+    "title_abstract_passed": 2,
+    "eligible": 2,
+    "excluded": 2,
+    "appraised": 2,
+    "sources_found": 0,
+    "sources_unparsed": 0,
+    "records_matched": 0,
+    "pending": 0,
+    "network": "disabled"
+  },
+  "contract_notes": {
+    "case_id": "produced directly by this run",
+    "status": "produced directly by this run",
+    "result": "produced directly by this run",
+    "evidence": "produced directly by this run",
+    "uncertainty": "produced directly by this run",
+    "errors": "produced directly by this run",
+    "stats": "produced directly by this run"
+  },
+  "output_contract_fields": {
+    "provided": [
+      "case_id",
+      "status",
+      "result",
+      "evidence",
+      "uncertainty",
+      "errors",
+      "stats"
+    ],
+    "present": {
+      "case_id": true,
+      "status": true,
+      "result": true,
+      "evidence": true,
+      "uncertainty": true,
+      "errors": true,
+      "stats": true
+    }
+  }
+}
