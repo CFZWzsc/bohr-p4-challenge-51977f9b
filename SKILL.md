@@ -9,7 +9,7 @@ description: Use when a review must follow a reproducible systematic-review prot
 
 当任务要求在给定文献批次上做系统性综述，而不是写叙述性综述时使用：先写出可复跑的检索式与限制，再做去重、题录/摘要筛选与合格性筛选，逐条记录排除理由，对纳入研究报告完整性做条目化评价，最后给出有边界的综合与冲突说明。
 
-**适用前提**：`case.json` 提供综述问题、可选 `criteria`（年份、语言、设计、是否要求全文）与记录数组。文本以标题/摘要为准，可选全文。
+**适用前提**：`case.json` 提供综述问题、可选 `criteria`（年份、语言、设计、是否要求全文）与记录数组。与 `case.json` 同目录（可递归）的 `.md/.txt/.csv/.json/.pdf` 作为材料文件被逐个读取并切成段落；文本以标题/摘要为准，匹配到材料时优先用全文段落定位。
 
 **不适用**：外部数据库实际检索、meta 分析、异质性检验、发表偏倚评估、双人独立筛选的模拟。
 
@@ -17,24 +17,29 @@ description: Use when a review must follow a reproducible systematic-review prot
 
 | 输入 | 说明 |
 |---|---|
-| `/input/case.json` | `review_question`/`research_question`/`topic`；`criteria`（`year_from`/`year_to`/`languages`/`designs`/`require_fulltext`）；`records[]`（`source_id`、`title`、`abstract`、`text`、`year`、`doi`、`language`、`study_type`、`full_text_available`）。 |
+| `/input/case.json` | `review_question`/`research_question`/`topic`；`criteria`（`year_from`/`year_to`/`languages`/`designs`/`require_fulltext`）；`records[]`（`source_id`、`title`、`abstract`、`authors`、`text`、`year`、`doi`、`language`、`study_type`、`full_text_available`）。 |
+| 材料文件 | 与 `case.json` 同目录的 `.md`/`.txt`/`.csv`/`.json`/`.pdf`，排序编号 `S1..Sn`，按段落编号 `P1..Pn`，定位形如 `S3#P7`。 |
 | `task.md` | 可选，问题缺失时兜底。 |
 | `--work` | 默认 `/app/work`。 |
 
 ## 处理流程（对应评分维度）
 
 1. **检索策略**（可核验性）：由问题词、设计、年份、语言拼出 `query_string`，写明数据库（仅提供的批次）、字段与限制，声明未访问外部库。
-2. **两轮筛选**（任务完成度）：第一轮去重与题录/摘要筛选（重复、无文本、年份、语言、主题不相关）；第二轮合格性（全文要求、设计不符、无摘要可读）。每条排除记录带 `round`、`code`、`detail`。
-3. **质量评价**（正确性）：对每条纳入研究检查六项报告完整性（设计、对照、样本量、结局测量、统计、局限），给出 0–6 分与 high/moderate/low；明确这是报告完整性而非研究质量结论。
-4. **PRISMA 流程**（完整性）：输出 identified、去重与筛选排除、题录通过、合格性排除、最终纳入。
-5. **综合**（正确性）：按方向标签（favours/no_difference/unclear）汇总，明确不做数值合并；按高报告研究与冲突给出 certainty。
-6. **冲突与空白**（完整性）：方向相反时并列；空白只写批次层面的单研究、仅摘要、筛选流失与标准缺失。
+2. **两轮筛选**（任务完成度）：第一轮去重与题录/摘要筛选（重复、无文本、E1 年份、E2 语言、E4 主题）；第二轮合格性（E5 全文要求、E3 设计、E4 摘要可读）。每条记录在 `screening_log` 占一行：`{id, stage, decision(include/exclude/duplicate), criteria_ids, reason_code, quote, locator}`，理由码见 `assets/reason_codes.json`。
+3. **质量评价**（正确性）：对每条纳入研究检查六项报告完整度（设计、对照、样本量、结局测量、统计、局限），每项输出 `{judgment: yes/partly/no/unclear, basis:{quote, locator}, note}`；`yes` 需全文段落命中，`partly` 仅题录层命中。`overall` 按 `overall_rule` 机械推导，不手工调级。结局词从题录与材料自动收集，不使用领域固定词表。
+4. **PRISMA 流程**（完整性）：`flow` 输出 identified、duplicates_removed、screened、title_abstract_excluded、title_abstract_passed、eligibility_excluded、included、pending，并由 `flow_assertion` 做三处闭合校验；`excluded_records` 保留逐条理由。
+5. **综合**（正确性）：按方向标签（favours/no_difference/unclear）汇总，明确不做数值合并；`synthesis.conclusions[]` 每条结论带 `effect_on_conclusion`，按高报告研究数与冲突说明该等级如何影响结论。
+6. **冲突与空白**（完整性）：方向相反时并列；空白按 (结局×人群×设计) 矩阵判空，每条 gap 带 `gap_type`、`basis(quote+locator)` 与 `why_not_omission`，区分“证据缺失”与“检索遗漏”。
+
+## 产物
+
+`result.json` 之外，在同一输出目录写 `report.md`（PRISMA 计数表、条款表、研究清单、冲突、空白）、`evidence_matrix.csv`、`screening_log.csv`；`result.artifacts` 只登记实际存在并通过 `os.path.exists` 自检的文件。
 
 ## 输出契约
 
 顶层：`case_id`、`status`、`result`、`evidence`、`uncertainty`、`errors`、`stats`、`contract_notes`、`output_contract_fields`。
 
-`result` 含：`review_question`、`search_strategy`、`flow`、`quality_appraisal`、`evidence_table`、`synthesis`、`conflicts`、`research_gaps`、`limitations`、`change_log`。
+`result` 含：`protocol`、`human_edits`、`review_question`、`search_strategy`、`criteria`、`flow`、`flow_assertion`、`screening_log`、`quality_appraisal`、`outcome_vocabulary`、`evidence_table`、`materials`、`synthesis`、`conflicts`、`research_gaps`、`artifacts`、`limitations`、`change_log`。
 
 输入 `output_contract` 的字段名全部保留在顶层，无法产出写 `null` 并在 `contract_notes` 说明。
 
@@ -48,6 +53,8 @@ description: Use when a review must follow a reproducible systematic-review prot
 | 重复记录 | 保留首条，其余记 `code=duplicate` | `flow.excluded_records` |
 | 无摘要 | 合格性轮排除 | `code=no_abstract` |
 | 无年份 | 不套用年份限制 | `uncertainty.type=no_years` |
+| 无材料文件 | 只用题录/摘要，质量评价降为 `partly` 上限 | `uncertainty.type=no_materials` |
+| PDF 无法解析 | 标 `unparsed`，不中断运行 | `uncertainty.type=unparsed_materials` |
 | 全部排除 | 不输出任何综合 | `status=insufficient_input` |
 | 输出不可写 | stderr 错误，退出码 3 | 无静默成功 |
 
@@ -67,7 +74,7 @@ python -B "tracks\deep-research-literature-review\challenges\challenge-51977f9b\
 ```
 
 - 示例输入：`examples/demo-case/case.json`，合成且自包含（`"demo": true`，4 条记录：1 条重复、2 条合格、1 条年份/设计不合格；DOI 均为虚构的 `10.0000/...`）。
-- 实测输出：`status = "success"`、`included = 2`，`result.json` 顶层含 `case_id`、`status`、`result`、`evidence`、`uncertainty`、`errors`、`stats`；同一输入两次运行结果逐字节一致。
+- 实测输出：`status = "success"`、`included = 2`，`flow` 闭合校验通过；除 `result.json` 外还生成 `report.md`、`evidence_matrix.csv`、`screening_log.csv`；同一输入两次运行结果逐字节一致。
 - 该用例只验证脚本可执行与输出契约齐全，不是真实的 PRISMA 流程结论。
 
 ## 最小调用示例（示例，非正式案例结果）
