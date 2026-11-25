@@ -1,0 +1,2 @@
+# Python 3.10+ — standard library only; no third-party packages required.
+# Optional external tool: poppler-utils `pdftotext` for PDF source materials (falls back to `unparsed` when absent).
