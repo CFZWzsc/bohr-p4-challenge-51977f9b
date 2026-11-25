@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "description": "Appraisal rubric for the systematic-review skill. Each item is matched sentence by sentence against title/abstract/body; the first matching sentence is quoted. This file is optional: if it is missing or unreadable, scripts/run_skill.py falls back to identical built-in defaults.",
+  "appraisal_items": [
+    {
+      "item": "design_stated",
+      "pattern": "\\brandomi[sz]ed\\b|\\bcohort\\b|\\bcase.control\\b|\\bcross.sectional\\b|\\btrial\\b|\\bexperiment\\b|\\bsurvey\\b|systematic review|随机|队列|病例对照|横断面|试验|实验"
+    },
+    {
+      "item": "comparator",
+      "pattern": "control group|control arm|compared (?:with|to)|\\bversus\\b|\\bvs\\.?\\b|\\bplacebo\\b|对照|比较|安慰剂"
+    },
+    {
+      "item": "sample_size",
+      "pattern": "\\bn\\s*=\\s*\\d+|\\b\\d+\\s+(?:participants|patients|subjects|adults|children|records|samples|mice|rats)\\b|样本"
+    },
+    {
+      "item": "outcome_measure",
+      "pattern": "\\bfalls?\\b|\\bfractures?\\b|\\bhba1c\\b|glyc(?:a|e)mic control|\\bmortality\\b|morbidity|\\brisk\\b|incidence|\\boutcomes?\\b|endpoints?|\\bscores?\\b|\\bscales?\\b|markers?|biomarkers?|\\brecovery\\b|survival|\\bdialysis\\b|adverse (?:events?|effects?)|\\brates?\\b|\\blevels?\\b|measured|assessed|evaluated|指标|量表|测量|结局"
+    },
+    {
+      "item": "statistics",
+      "pattern": "\\bp\\s*[<>=]|95\\s?%\\s?(?:CI|confidence)|confidence interval|\\bCI\\b|hazard ratio|odds ratio|risk ratio|relative risk|effect size|regression|significan|统计|置信区间|显著"
+    },
+    {
+      "item": "limitations",
+      "pattern": "\\blimitations?\\b|caveat|\\bbias\\b|confound|small sample|underpowered|generali[sz]|局限|偏倚|混杂"
+    }
+  ]
+}
