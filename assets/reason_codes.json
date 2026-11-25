@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "description": "Reason-code dictionary for the two-round screening ledger. Each row in screening_log carries one code; criteria_id links the code to an E1-E5 eligibility clause (null means the code is procedural and not an eligibility criterion).",
+  "codes": [
+    {
+      "code": "duplicate",
+      "stage": "identification",
+      "criteria_id": null,
+      "text": "Duplicate DOI or normalised title; the first occurrence is retained."
+    },
+    {
+      "code": "no_text",
+      "stage": "title_abstract",
+      "criteria_id": null,
+      "text": "No title or abstract text is supplied, so eligibility cannot be judged."
+    },
+    {
+      "code": "year",
+      "stage": "title_abstract",
+      "criteria_id": "E1",
+      "text": "Publication year falls outside the declared window."
+    },
+    {
+      "code": "language",
+      "stage": "title_abstract",
+      "criteria_id": "E2",
+      "text": "Language is outside the declared language set."
+    },
+    {
+      "code": "topic",
+      "stage": "title_abstract",
+      "criteria_id": "E4",
+      "text": "No review-question term appears in the title/abstract, so population or topic mismatches."
+    },
+    {
+      "code": "design",
+      "stage": "eligibility",
+      "criteria_id": "E3",
+      "text": "Study design is outside the declared eligible designs."
+    },
+    {
+      "code": "no_fulltext",
+      "stage": "eligibility",
+      "criteria_id": "E5",
+      "text": "Full text is required by the protocol but no full text or body text is available."
+    },
+    {
+      "code": "no_abstract",
+      "stage": "eligibility",
+      "criteria_id": "E4",
+      "text": "No abstract is available, so outcome data cannot be read for eligibility."
+    },
+    {
+      "code": "met_criteria",
+      "stage": "included",
+      "criteria_id": null,
+      "text": "All applicable criteria were met; the record enters synthesis."
+    }
+  ]
+}
