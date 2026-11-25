@@ -16,7 +16,10 @@ answers, private data or credentials are included.
 | File |
 |------|
 | `SKILL.md` |
+| `assets/policy.json` |
 | `examples/demo-case/case.json` |
+| `references/appraisal-rubric.md` |
+| `references/method.md` |
 | `scripts/run_skill.py` |
 | `README.md` |
 
