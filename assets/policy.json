@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "description": "Appraisal rubric for the systematic-review skill. Each item is matched sentence by sentence against title/abstract/body; the first matching sentence is quoted. This file is optional: if it is missing or unreadable, scripts/run_skill.py falls back to identical built-in defaults.",
+  "version": 2,
+  "description": "Appraisal rubric for the systematic-review skill. Each item is matched sentence by sentence against full-text paragraphs first, then title/abstract; the first matching sentence is quoted with its locator. The outcome_measure item keeps only generic measurement cues here: the skill adds outcome terms collected from the supplied records and materials at run time, so no domain word list is hard-coded. This file is optional: if it is missing or unreadable, scripts/run_skill.py falls back to identical built-in defaults.",
   "appraisal_items": [
     {
       "item": "design_stated",
@@ -16,7 +16,7 @@
     },
     {
       "item": "outcome_measure",
-      "pattern": "\\bfalls?\\b|\\bfractures?\\b|\\bhba1c\\b|glyc(?:a|e)mic control|\\bmortality\\b|morbidity|\\brisk\\b|incidence|\\boutcomes?\\b|endpoints?|\\bscores?\\b|\\bscales?\\b|markers?|biomarkers?|\\brecovery\\b|survival|\\bdialysis\\b|adverse (?:events?|effects?)|\\brates?\\b|\\blevels?\\b|measured|assessed|evaluated|指标|量表|测量|结局"
+      "pattern": "\\boutcomes?\\b|endpoints?|\\bscores?\\b|scales?|markers?|biomarkers?|\\bmeasured\\b|\\bassessed\\b|evaluated|incidence|\\brates?\\b|\\blevels?\\b|adverse (?:events?|effects?)|指标|量表|测量|结局|水平"
     },
     {
       "item": "statistics",
