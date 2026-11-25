@@ -21,6 +21,34 @@ respective interface, but `hits_per_query` counts matches in the supplied batch 
 4. `database`, `executed_at` (the fixed string `not_applicable (offline run)`) and
    `hits_per_query` make the strategy auditable without a clock or network.
 
+## Materials and locators
+
+Files next to `case.json` (`.md`, `.txt`, `.csv`, `.json`, `.pdf`) are sorted by relative path and
+numbered `S1..Sn`. Each file is split into paragraphs `P1..Pn`; a locator is `S3#P7`. PDFs use
+`pdftotext` when the binary exists, otherwise an in-process zlib/stream decoder, otherwise the file is
+marked `unparsed`. Records are matched to materials by DOI, normalised title containment, title-token
+overlap and first-author surname; a match needs a score of at least 0.6. Unmatched records stay on the
+title/abstract layer and are flagged in `research_gaps` and `uncertainty`.
+
+## Screening ledger and flow closure
+
+Every record gets exactly one `screening_log` row with `stage` (`identification`, `title_abstract`,
+`eligibility`, `included`), `decision` (`duplicate`, `exclude`, `include`), `criteria_ids` (E1–E5),
+`reason_code` (dictionary in `assets/reason_codes.json`), `quote` and `locator`. `flow` separates
+duplicates from screening exclusions, adds `pending`, and `flow_assertion` checks:
+
+- `identified - duplicates_removed = screened`;
+- `screened - title_abstract_excluded = title_abstract_passed`;
+- `title_abstract_passed - eligibility_excluded = included`.
+
+## Evidence gaps
+
+Gaps are generated against an (outcome × population × design) matrix. Process gaps (no eligible
+study, single study, missing full text, undeclared criteria, screening attrition) and selection gaps
+(outcome / design / population not covered by the included set) each carry `gap_type`,
+`matrix_cell`, `basis {quote, locator}` and `why_not_omission`, so an absence of evidence is not
+confused with an omitted search term.
+
 ## Determinism
 
 No wall-clock time, randomness, locale-dependent formatting or absolute host paths are used.
