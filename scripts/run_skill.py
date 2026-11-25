@@ -24,14 +24,64 @@ DEFAULT_CASE = "/input/case.json"
 DEFAULT_OUT = "/app/output/result.json"
 DEFAULT_WORK = "/app/work"
 RECORD_KEYS = ("records", "papers", "documents", "literature", "sources", "items", "citations")
-APPRAISAL_ITEMS = (
-    ("design_stated", r"randomi[sz]ed|cohort|case.control|cross.sectional|trial|experiment|survey|systematic review|随机|队列|病例对照|横断面|试验|实验"),
-    ("comparator", r"control group|compared with|versus|placebo|control|对照|比较|安慰剂"),
-    ("sample_size", r"\bn\s*=\s*\d+|\d+\s+(participants|patients|subjects|adults|records|samples)|样本"),
-    ("outcome_measure", r"measured|assessed|score|scale|outcome|endpoint|指标|量表|测量|结局"),
-    ("statistics", r"\bp\s*[<=>]|confidence interval|\bCI\b|hazard ratio|odds ratio|effect size|regression|统计|置信区间|显著"),
-    ("limitations", r"limitation|caveat|bias|confound|局限|偏倚|混杂"),
+EXECUTED_AT = "not_applicable (offline run)"
+POLICY_PATH = Path(__file__).resolve().parent.parent / "assets" / "policy.json"
+DEFAULT_STOPWORDS = {
+    "a", "an", "the", "and", "or", "but", "not", "no", "of", "in", "on", "at", "to", "into",
+    "for", "with", "without", "from", "by", "as", "than", "then", "that", "this", "these", "those",
+    "there", "their", "its", "it", "is", "are", "was", "were", "be", "been", "being",
+    "do", "does", "did", "done", "has", "have", "had", "can", "could", "should", "would",
+    "may", "might", "must", "will", "shall", "what", "which", "who", "whom", "whose", "when",
+    "where", "why", "how", "whether", "if", "we", "our", "us", "they", "them", "he", "she",
+    "his", "her", "i", "you", "study", "studies", "effect", "effects", "result", "results",
+    "research", "review", "paper", "papers", "data", "group", "groups", "between", "among",
+    "also", "more", "most", "less", "least", "such", "using", "use", "used", "via", "per",
+    "reduce", "reduces", "reduced", "reducing", "reduction", "improve", "improves", "improved",
+    "improving", "improvement", "increase", "increases", "increased", "increasing",
+    "decrease", "decreases", "decreased", "prevent", "prevents", "prevention",
+}
+DEFAULT_APPRAISAL_ITEMS = (
+    ("design_stated", r"\brandomi[sz]ed\b|\bcohort\b|\bcase.control\b|\bcross.sectional\b|\btrial\b|\bexperiment\b|\bsurvey\b|systematic review|随机|队列|病例对照|横断面|试验|实验"),
+    ("comparator", r"control group|control arm|compared (?:with|to)|\bversus\b|\bvs\.?\b|\bplacebo\b|对照|比较|安慰剂"),
+    ("sample_size", r"\bn\s*=\s*\d+|\b\d+\s+(?:participants|patients|subjects|adults|children|records|samples|mice|rats)\b|样本"),
+    ("outcome_measure", r"\bfalls?\b|\bfractures?\b|\bhba1c\b|glyc(?:a|e)mic control|\bmortality\b|morbidity|\brisk\b|incidence|\boutcomes?\b|endpoints?|\bscores?\b|\bscales?\b|markers?|biomarkers?|\brecovery\b|survival|\bdialysis\b|adverse (?:events?|effects?)|\brates?\b|\blevels?\b|measured|assessed|evaluated|指标|量表|测量|结局"),
+    ("statistics", r"\bp\s*[<>=]|95\s?%\s?(?:CI|confidence)|confidence interval|\bCI\b|hazard ratio|odds ratio|risk ratio|relative risk|effect size|regression|significan|统计|置信区间|显著"),
+    ("limitations", r"\blimitations?\b|caveat|\bbias\b|confound|small sample|underpowered|generali[sz]|局限|偏倚|混杂"),
 )
+LANGUAGE_NAMES = {"en": "english", "zh": "chinese", "de": "german", "fr": "french", "es": "spanish",
+                  "ja": "japanese", "ko": "korean", "ru": "russian", "it": "italian", "pt": "portuguese"}
+
+
+def load_policy():
+    """Read assets/policy.json when present; fall back to built-in defaults."""
+    defaults = {"stopwords": sorted(DEFAULT_STOPWORDS),
+                "appraisal_items": [list(pair) for pair in DEFAULT_APPRAISAL_ITEMS]}
+    try:
+        with open(POLICY_PATH, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (OSError, ValueError, TypeError):
+        return defaults
+    if not isinstance(data, dict):
+        return defaults
+    extra = data.get("stopwords")
+    if isinstance(extra, list):
+        words = {word.lower() for word in extra if isinstance(word, str) and word.strip()}
+        if words:
+            defaults["stopwords"] = sorted(set(DEFAULT_STOPWORDS) | words)
+    declared = data.get("appraisal_items")
+    parsed = []
+    if isinstance(declared, list):
+        for entry in declared:
+            if isinstance(entry, dict) and isinstance(entry.get("item"), str) and isinstance(entry.get("pattern"), str):
+                parsed.append([entry["item"], entry["pattern"]])
+    if parsed:
+        defaults["appraisal_items"] = parsed
+    return defaults
+
+
+_POLICY = load_policy()
+STOPWORDS = set(_POLICY["stopwords"])
+APPRAISAL_ITEMS = tuple((item, pattern) for item, pattern in _POLICY["appraisal_items"])
 
 
 def load_json(path):
@@ -86,9 +136,8 @@ def parse_year(value):
 
 def tokenize(text, limit=24):
     lowered = norm_space(text).lower()
-    stop = {"the", "and", "for", "with", "from", "that", "this", "these", "were", "was", "are", "study",
-            "studies", "effect", "effects", "results", "research", "review", "paper", "data", "group"}
-    terms = [word for word in re.findall(r"[A-Za-z][A-Za-z0-9\-]{2,}", lowered) if word not in stop and not word.isdigit()]
+    terms = [word for word in re.findall(r"[A-Za-z][A-Za-z0-9\-]{2,}", lowered)
+             if word not in STOPWORDS and not word.isdigit()]
     for chunk in re.findall(r"[\u4e00-\u9fff]{2,}", text):
         for index in range(len(chunk) - 1):
             terms.append(chunk[index:index + 2])
@@ -172,24 +221,120 @@ def criteria_of(case):
     }
 
 
-def search_strategy(question, criteria):
+def _term_clause(terms, anchor_limit=3, field=None):
+    if not terms:
+        return ""
+    suffix = "[tiab]" if field == "pubmed" else ""
+
+    def wrap(term):
+        return '"%s"%s' % (term, suffix)
+
+    anchors = terms[:anchor_limit]
+    rest = terms[anchor_limit:]
+    clause = " AND ".join(wrap(term) for term in anchors)
+    if rest:
+        clause = "(%s) AND (%s)" % (clause, " OR ".join(wrap(term) for term in rest))
+    return clause
+
+
+def _design_clause(criteria, pubmed=False):
+    if not criteria["designs"]:
+        return ""
+    suffix = "[tiab]" if pubmed else ""
+    return "(" + " OR ".join('"%s"%s' % (item, suffix) for item in criteria["designs"]) + ")"
+
+
+def _year_clause(criteria, pubmed=False):
+    year_from, year_to = criteria["year_from"], criteria["year_to"]
+    if pubmed:
+        if year_from and year_to:
+            return '("%d"[dp] : "%d"[dp])' % (year_from, year_to)
+        if year_from:
+            return '("%d"[dp] : "3000"[dp])' % year_from
+        if year_to:
+            return '("1800"[dp] : "%d"[dp])' % year_to
+        return ""
+    parts = []
+    if year_from:
+        parts.append("PUBYEAR >= %d" % year_from)
+    if year_to:
+        parts.append("PUBYEAR <= %d" % year_to)
+    return " AND ".join(parts)
+
+
+def _language_clause(criteria, pubmed=False):
+    languages = criteria["languages"]
+    if not languages:
+        return ""
+    if pubmed:
+        return "(" + " OR ".join("%s[la]" % LANGUAGE_NAMES.get(item, item) for item in languages) + ")"
+    return "LANGUAGE(" + ", ".join(LANGUAGE_NAMES.get(item, item) for item in languages) + ")"
+
+
+def _passes_filters(record, terms, criteria):
+    text = (record["title"] + " " + record["abstract"]).lower()
+    if terms and not any(term in text for term in terms):
+        return False
+    if criteria["designs"] and record["design"]:
+        design = record["design"].lower()
+        if not any(item in design for item in criteria["designs"]):
+            return False
+    if criteria["year_from"] and record["year"] and record["year"] < criteria["year_from"]:
+        return False
+    if criteria["year_to"] and record["year"] and record["year"] > criteria["year_to"]:
+        return False
+    if criteria["languages"] and record["language"] and record["language"] not in criteria["languages"]:
+        return False
+    return True
+
+
+def search_strategy(question, criteria, records=()):
     terms = tokenize(question, limit=10)
-    core = " AND ".join('"%s"' % term for term in terms[:3]) if terms else '"%s"' % question[:80]
-    facets = [core]
-    if criteria["designs"]:
-        facets.append("(" + " OR ".join('"%s"' % item for item in criteria["designs"]) + ")")
-    if criteria["year_from"] or criteria["year_to"]:
-        facets.append("PUBYEAR > %s AND PUBYEAR < %s" % (criteria["year_from"] or 1900, criteria["year_to"] or 2100))
-    if criteria["languages"]:
-        facets.append("LANGUAGE " + " OR ".join(item.upper() for item in criteria["languages"]))
+    core = _term_clause(terms)
+    design = _design_clause(criteria)
+    year = _year_clause(criteria)
+    language = _language_clause(criteria)
+    query_string = " AND ".join(part for part in (core, design, year, language) if part)
+    query_pubmed = " AND ".join(part for part in (
+        _term_clause(terms, 3, "pubmed"), _design_clause(criteria, True),
+        _year_clause(criteria, True), _language_clause(criteria, True)) if part)
+    texts = [(record["title"] + " " + record["abstract"]).lower() for record in records]
+    hits = []
+    if core:
+        hits.append({"label": "core_terms", "query": core,
+                     "hits": sum(1 for text in texts if any(term in text for term in terms))})
+    if design:
+        hits.append({"label": "design_filter", "query": design,
+                     "hits": sum(1 for record in records
+                                 if record["design"] and any(item in record["design"].lower()
+                                                             for item in criteria["designs"]))})
+    if year:
+        hits.append({"label": "year_filter", "query": year,
+                     "hits": sum(1 for record in records
+                                 if not ((criteria["year_from"] and record["year"] and record["year"] < criteria["year_from"])
+                                         or (criteria["year_to"] and record["year"] and record["year"] > criteria["year_to"])))})
+    if language:
+        hits.append({"label": "language_filter", "query": language,
+                     "hits": sum(1 for record in records
+                                 if not (criteria["languages"] and record["language"]
+                                         and record["language"] not in criteria["languages"]))})
+    hits.append({"label": "combined_after_limits", "query": query_string,
+                 "hits": sum(1 for record in records if _passes_filters(record, terms, criteria))})
     return {
         "components": {"question_terms": terms, "designs": criteria["designs"], "languages": criteria["languages"],
                        "years": [criteria["year_from"], criteria["year_to"]]},
-        "query_string": " AND ".join(facets),
+        "query_string": query_string,
+        "query_string_pubmed": query_pubmed,
+        "database": "supplied_record_batch",
         "databases": ["supplied_record_batch"],
+        "executed_at": EXECUTED_AT,
+        "hits_per_query": hits,
         "fields": ["title", "abstract"],
-        "limits": {"languages": criteria["languages"], "years": [criteria["year_from"], criteria["year_to"]]},
-        "note": "executed against the supplied batch only; no external database was contacted",
+        "limits": {"languages": criteria["languages"], "years": [criteria["year_from"], criteria["year_to"]],
+                   "year_from_inclusive": True, "year_to_applied": criteria["year_to"] is not None},
+        "note": ("query_string uses Scopus syntax (PUBYEAR) and query_string_pubmed uses PubMed [tiab]/[dp]; "
+                 "both are paste-ready, but hit counts are computed on the supplied batch only and no external "
+                 "database was contacted"),
     }
 
 
@@ -245,29 +390,84 @@ def round_two(records, criteria):
     return eligible, excluded
 
 
+def split_sentences(text):
+    return [part for part in re.split(r"(?<=[.!?;])\s+", norm_space(text)) if part]
+
+
 def appraise(record):
-    text = (record["title"] + " " + record["abstract"] + " " + record["body"]).lower()
+    sentences = []
+    for part in (record["abstract"], record["body"], record["title"]):
+        sentences.extend(split_sentences(part))
     items = []
     score = 0
     for name, pattern in APPRAISAL_ITEMS:
-        reported = bool(re.search(pattern, text, re.IGNORECASE))
-        items.append({"item": name, "reported": reported,
-                      "judgement": "reported" if reported else "not reported (cannot be assumed absent in the study)"})
+        quote = ""
+        for sentence in sentences:
+            if re.search(pattern, sentence, re.IGNORECASE):
+                quote = sentence
+                break
+        reported = bool(quote)
+        items.append({"item": name, "value": "reported" if reported else "not reported",
+                      "quote": quote, "checked": True, "reported": reported})
         score += 1 if reported else 0
     total = len(APPRAISAL_ITEMS)
     level = "high" if score >= 5 else ("moderate" if score >= 3 else "low")
     return {"source_id": record["source_id"], "items": items, "reported_items": score, "total_items": total,
             "appraisal_level": level,
-            "note": "appraisal concerns reporting completeness of the supplied text, not study conduct"}
+            "note": ("each item records the sentence it matched, or 'not reported' when no sentence matched; "
+                     "this measures reporting completeness of the supplied text, not study conduct")}
+
+
+DIRECTION_NO_DIFFERENCE = (r"no significant (?:difference|change|effect|association)|no difference|"
+                           r"not significantly different|did not differ|no effect|no benefit|"
+                           r"无显著|无差异|无统计学")
+DIRECTION_AGAINST = (r"\bworse\b|\bharmful\b|increased (?:risk|mortality|incidence)\b|"
+                     r"higher (?:risk|mortality|incidence|fall|fracture)|more (?:falls|fractures|events)\b|"
+                     r"\bagainst\b|不利|更差")
+DIRECTION_FAVOURS = (r"\blower\b|\breduc(?:e|ed|es|tion)\b|\bdecreas(?:e|ed|es)\b|\bfewer\b|"
+                     r"\bimprove(?:d|s|ment)?\b|\bbenefit|\beffective\b|\bprotective\b|\bfavou?rs?\b|"
+                     r"\bbetter\b|higher (?:survival|recovery)|改善|降低|减少|有效|优于")
 
 
 def direction(text):
-    lowered = text.lower()
-    pos = sum(1 for cue in ("improve", "improved", "increase", "benefit", "effective", "significant", "改善", "提高", "有效") if cue in lowered)
-    neg = sum(1 for cue in ("no effect", "no significant", "not significant", "no benefit", "worse", "adverse", "无效", "无显著", "无差异") if cue in lowered)
-    if "no significant" in lowered or "not significant" in lowered:
-        pos = max(0, pos - 1)
-    return "favours" if pos > neg else ("no_difference" if neg > pos else "unclear")
+    lowered = norm_space(text).lower()
+    if re.search(DIRECTION_NO_DIFFERENCE, lowered):
+        return "no_difference"
+    favours = len(re.findall(DIRECTION_FAVOURS, lowered))
+    against = len(re.findall(DIRECTION_AGAINST, lowered))
+    if favours and not against:
+        return "favours"
+    if against and not favours:
+        return "against"
+    if favours and against:
+        if favours > against:
+            return "favours"
+        if against > favours:
+            return "against"
+    return "unclear"
+
+
+def build_conflicts(rows):
+    groups = {}
+    for row in rows:
+        groups.setdefault(row["direction"], []).append(row)
+    conflicts = []
+    for opposing in ("no_difference", "against"):
+        for left in groups.get("favours", []):
+            for right in groups.get(opposing, []):
+                conflicts.append({
+                    "id": "C%d" % (len(conflicts) + 1),
+                    "type": "opposing_direction",
+                    "directions": [left["direction"], right["direction"]],
+                    "positions": [
+                        {"source_id": left["source_id"], "direction": left["direction"],
+                         "quote": left["quote"], "locator": left["locator"], "year": left["year"]},
+                        {"source_id": right["source_id"], "direction": right["direction"],
+                         "quote": right["quote"], "locator": right["locator"], "year": right["year"]},
+                    ],
+                    "handling": "both directions are reported side by side; no numerical pooling is performed",
+                })
+    return conflicts
 
 
 def build_payload(case, task_text):
@@ -275,23 +475,24 @@ def build_payload(case, task_text):
     records = [normalize(raw, locator, index) for index, (locator, raw) in enumerate(raw_records)]
     question = question_of(case, task_text)
     criteria = criteria_of(case)
-    strategy = search_strategy(question, criteria)
+    strategy = search_strategy(question, criteria, records)
     passed, ex1 = round_one(records, criteria, question)
     eligible, ex2 = round_two(passed, criteria)
     appraisals = [appraise(record) for record in eligible]
     synth = []
     for record in eligible:
         text = record["abstract"] or record["body"] or record["title"]
-        synth.append({"source_id": record["source_id"], "direction": direction(text),
-                      "quote": text[:320], "year": record["year"], "appraisal_level": next(
+        synth.append({"source_id": record["source_id"], "locator": record["locator"],
+                      "direction": direction(text), "quote": text[:320], "year": record["year"],
+                      "appraisal_level": next(
                           (item["appraisal_level"] for item in appraisals if item["source_id"] == record["source_id"]), "low")})
-    directions = {row["direction"] for row in synth if row["direction"] != "unclear"}
-    conflicts = []
-    if "favours" in directions and "no_difference" in directions:
-        conflicts.append({"type": "opposing_direction",
-                          "positions": [{"source_id": row["source_id"], "direction": row["direction"], "quote": row["quote"]}
-                                        for row in synth if row["direction"] in ("favours", "no_difference")],
-                          "handling": "both directions are reported; the pool is not pooled numerically"})
+    direction_summary = {}
+    for label in ("favours", "no_difference", "against", "unclear"):
+        ids = [row["source_id"] for row in synth if row["direction"] == label]
+        if ids:
+            direction_summary[label] = ids
+    conflicts = build_conflicts(synth)
+    conflict_ids = [item["id"] for item in conflicts]
     high = [row for row in synth if row["appraisal_level"] == "high"]
     if not synth:
         certainty = "no included evidence"
@@ -332,6 +533,24 @@ def build_payload(case, task_text):
     else:
         status = "success"
 
+    boundary = ("conclusions are bounded by the supplied batch and its abstracts: no numerical pooling, "
+                "risk-of-bias assessment, heterogeneity test or external database search was performed")
+    if not eligible:
+        statement = "No record met the stated criteria; no synthesis or direction is offered."
+    else:
+        parts = ["%d record(s) met the stated criteria." % len(eligible),
+                 "Direction of effect: " + "; ".join("%s in %s" % (label, ", ".join(ids))
+                                                      for label, ids in direction_summary.items()) + "."]
+        if conflicts:
+            parts.append("The included evidence conflicts (%s: %s), so no single net direction is asserted." % (
+                ", ".join(conflict_ids),
+                "; ".join("%s vs %s" % (item["positions"][0]["source_id"], item["positions"][1]["source_id"])
+                          for item in conflicts)))
+        else:
+            parts.append("No opposing directional findings were detected in the included set.")
+        parts.append("Boundary: " + boundary + ".")
+        statement = " ".join(parts)
+
     result = {
         "review_question": question,
         "search_strategy": strategy,
@@ -348,7 +567,10 @@ def build_payload(case, task_text):
         "synthesis": {
             "certainty": certainty,
             "included": [row["source_id"] for row in synth],
-            "statement": ("%d record(s) met the stated criteria; direction labels and certainty are limited to their abstracts." % len(eligible)) if eligible else "No record met the criteria; no synthesis is offered.",
+            "direction_summary": direction_summary,
+            "conflict_ids": conflict_ids,
+            "statement": statement,
+            "boundary": boundary,
             "pooling": "no meta-analysis was performed; estimates are not combined numerically",
         },
         "conflicts": conflicts,
@@ -360,11 +582,11 @@ def build_payload(case, task_text):
             "No meta-analysis, heterogeneity test or publication-bias assessment is performed.",
         ],
         "change_log": [
-            "Generated a reproducible search string with explicit limits.",
+            "Generated paste-ready PubMed/Scopus search strings with stopwords removed and inclusive year limits.",
             "Removed duplicates and screened titles/abstracts with reasons.",
             "Applied eligibility checks and recorded every exclusion.",
-            "Appraised reporting completeness against six explicit items.",
-            "Synthesised directions with conflicts and certainty stated.",
+            "Appraised reporting completeness against six explicit items, quoting the matched sentence.",
+            "Synthesised direction, conflicts and certainty with an explicit boundary.",
         ],
     }
     return {
